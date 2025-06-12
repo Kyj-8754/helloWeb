@@ -16,6 +16,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          
+        # 그래들 실행 권한 설정
+      - name: 실행권한 설정
+        run: chmod +x gradlew
+        
         # 그래들 빌드
       - name: build
         run: ./gradlew bootJar
