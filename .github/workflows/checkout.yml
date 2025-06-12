@@ -26,7 +26,7 @@ jobs:
         run: ./gradlew bootJar
         # 이미지 생성
       - name: docker image build
-        run: docker build -t span5189/hello-web:latest .
+        run: docker build -t ${{ secrets.USERNAME }}/hello-web:latest .
         # 도커 허브 로그인
       - name: docker hub login
         uses: docker/login-action@v1
@@ -35,6 +35,6 @@ jobs:
           password: ${{ secrets.PASSWORD }}
         # 도커 허브 푸쉬
       - name: docker hub push
-        run: docker push span5189/hello-web:latest
+        run: docker push ${{ secrets.USERNAME }}/hello-web:latest
         
       
