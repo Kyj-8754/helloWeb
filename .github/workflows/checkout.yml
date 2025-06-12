@@ -15,6 +15,7 @@ jobs:
         # 매개변수 설정
         with:
           java-version: '17'
+          distribution: 'temurin'
         # 그래들 빌드
       - name: build
         run: ./gradlew bootJar
