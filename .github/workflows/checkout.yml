@@ -3,8 +3,11 @@ on:
   push:
     # main에 대해서만 실행하도록 설정
     branches: [ main ]
+#환경 설정 변수
+env:
+  REPOSITORY_NAME: hello-web:latest
 jobs:
-  checkout:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,7 +29,7 @@ jobs:
         run: ./gradlew bootJar
         # 이미지 생성
       - name: docker image build
-        run: docker build -t ${{ secrets.USERNAME }}/hello-web:latest .
+        run: docker build -t ${{ secrets.USERNAME }}/${{env.REPOSITORY_NAME}} .
         # 도커 허브 로그인
       - name: docker hub login
         uses: docker/login-action@v1
@@ -35,6 +38,26 @@ jobs:
           password: ${{ secrets.PASSWORD }}
         # 도커 허브 푸쉬
       - name: docker hub push
-        run: docker push ${{ secrets.USERNAME }}/hello-web:latest
+        run: docker push ${{ secrets.USERNAME }}/${{env.REPOSITORY_NAME}}
         
-      
+  deploy:
+    # build 가 끝나야 실행하도록 설정
+    needs: build
+    name: 서버에 배포 단계
+    runs-on: [ self-hosted, label-me ]
+    steps:
+    - name: 운영서버에서 docker hub 로그인
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        
+    - name: docker-compose에서 이미지 다운로드 및 실행
+    # | 를 추가하면 여러개의 명령어를 추가할 수 있다.
+      run:  |
+        cd ~/helloWeb
+        docker-compose down
+        docker-compose pull
+        docker-compose up -d
+    
+    
